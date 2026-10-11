@@ -5,6 +5,7 @@ import packageRouter from './routes/packageRoute';
 import teachingSessionRouter from './routes/teachingSessionRoute';
 import enrollmentRouter from './routes/enrollmentRoute';
 // import paymentRouter from './routes/paymentRoutes';
+import router from './routes/seedRoute'
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use('/api/packages', packageRouter);
 app.use('/api/teaching-sessions', teachingSessionRouter);
 app.use('/api/enrollments', enrollmentRouter);
 // app.use('/api/payments', paymentRouter);
+app.use("/", router)
 
 const port = process.env.PORT;
 

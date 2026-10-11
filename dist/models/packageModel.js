@@ -25,7 +25,7 @@ async function createPackage(lessonPackage) {
             level,
             type,
             duration,
-            price,
+            price
         )VALUES($1, $2, $3, $4, $5, $6) RETURNING *
         `, [lessonPackage.title, lessonPackage.description, lessonPackage.level, lessonPackage.type, lessonPackage.duration, lessonPackage.price]);
     return result.rows[0];
