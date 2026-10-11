@@ -1,101 +1,84 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const teachingSessions_1 = require("../data/teachingSessions");
-const packages_1 = require("../data/packages");
-const teachingSessionController = {
-    getAllTeachingSessions: function (req, res) {
-        return res.status(200).json(teachingSessions_1.teachingSessions);
-    },
-    getTeachingSessionById: function (req, res) {
-        const id = req.params.id;
-        const session = teachingSessions_1.teachingSessions.find((session) => session.id === id);
-        if (!session) {
-            return res.status(404).json({
-                error: 'Teaching session not found',
-            });
+const sessionModel_1 = require("../models/sessionModel");
+const sessionController = {
+    getAllTeachingSessions: async function (req, res) {
+        try {
+            const result = await (0, sessionModel_1.getAllTeachingSession)();
+            return res.status(200).json(result);
         }
-        return res.status(200).json(session);
-    },
-    createTeachingSession: function (req, res) {
-        const { packageId, date, startTime, endTime, maxStudents, meetingLink, } = req.body;
-        if (!packageId ||
-            !date ||
-            !startTime ||
-            !endTime ||
-            !maxStudents ||
-            !meetingLink) {
-            return res.status(400).json({
-                error: 'All fields are required',
-            });
+        catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Internal server error' });
         }
-        const lessonPackage = packages_1.packages.find((pack) => pack.id === packageId);
-        if (!lessonPackage) {
-            return res.status(404).json({
-                error: 'Package not found',
-            });
-        }
-        const id = `session-00${teachingSessions_1.teachingSessions.length + 1}`;
-        const teachingSession = {
-            id,
-            packageId,
-            date,
-            startTime,
-            endTime,
-            maxStudents,
-            meetingLink,
-            status: 'scheduled',
-        };
-        teachingSessions_1.teachingSessions.push(teachingSession);
-        return res.status(201).json({
-            message: 'Teaching session created successfully',
-            session: teachingSession,
-        });
     },
-    updateTeachingSession: function (req, res) {
-        const allowedFields = [
-            'date',
-            'startTime',
-            'endTime',
-            'maxStudents',
-            'meetingLink',
-            'status',
-        ];
-        const updatedSession = {};
-        for (const field of allowedFields) {
-            if (req.body[field] !== undefined) {
-                updatedSession[field] = req.body[field];
+    getTeachingSessionById: async function (req, res) {
+        try {
+            const id = req.params.id;
+            if (typeof id !== 'string') {
+                return res.status(400).json({ error: 'Invalid session ID' });
             }
+            const session = await (0, sessionModel_1.getSessionById)(id);
+            if (!session) {
+                return res.status(404).json({ error: 'Session not found' });
+            }
+            return res.status(200).json(session);
         }
-        const id = req.params.id;
-        const session = teachingSessions_1.teachingSessions.find((session) => session.id === id);
-        if (!session) {
-            return res.status(404).json({
-                error: 'Teaching session not found',
-            });
+        catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Internal server error' });
         }
-        if (Object.keys(updatedSession).length === 0) {
-            return res.status(400).json({
-                error: 'No valid fields provided for update',
-            });
-        }
-        Object.assign(session, updatedSession);
-        return res.status(200).json({
-            message: 'Teaching session updated successfully',
-            session,
-        });
     },
-    deleteTeachingSession: function (req, res) {
-        const id = req.params.id;
-        const index = teachingSessions_1.teachingSessions.findIndex((session) => session.id === id);
-        if (index === -1) {
-            return res.status(404).json({
-                error: 'Teaching session not found',
+    createTeachingSession: async function (req, res) {
+        try {
+            const session = req.body;
+            const result = await (0, sessionModel_1.createSession)(session);
+            return res.status(201).json(result);
+        }
+        catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    updateTeachingSession: async function (req, res) {
+        try {
+            const id = req.params.id;
+            if (typeof id !== 'string') {
+                return res.status(400).json({ error: 'Invalid session ID' });
+            }
+            const session = req.body;
+            const result = await (0, sessionModel_1.updateSession)(id, session);
+            if (!result) {
+                return res.status(404).json({
+                    error: 'Session not found or no fields provided to update',
+                });
+            }
+            return res.status(200).json(result);
+        }
+        catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    cancelTeachingSession: async function (req, res) {
+        try {
+            const id = req.params.id;
+            if (typeof id !== 'string') {
+                return res.status(400).json({ error: 'Invalid session ID' });
+            }
+            const result = await (0, sessionModel_1.cancelSession)(id);
+            if (!result) {
+                return res.status(404).json({ error: 'Session not found' });
+            }
+            return res.status(200).json({
+                message: 'Session cancelled successfully',
+                session: result,
             });
         }
-        teachingSessions_1.teachingSessions.splice(index, 1);
-        return res.status(200).json({
-            message: 'Teaching session deleted successfully',
-        });
+        catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
     },
 };
-exports.default = teachingSessionController;
+exports.default = sessionController;

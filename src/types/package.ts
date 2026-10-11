@@ -1,26 +1,33 @@
-type Level = "Beginner" | "Intermediate" | "Advanced"
-type Type = "group" | "one-to-one"
+type Level = 'Beginner' | 'Intermediate' | 'Advanced';
+type Type = 'group' | 'one-to-one';
 
 interface LessonPackage {
-    id: string;
-    title: string;
-    description: string;
-    level: Level;
-    type: Type;
-    duration: number;
-    price: number;
-    maxStudents: number;
-    isActive: boolean;
+  package_id: string;
+  title: string;
+  description: string;
+  level: Level;
+  type: Type;
+  duration: number;
+  price: number;
+  is_active: boolean;
 }
 
 interface CreateLessonPackage {
-    title: string;
-    description: string;
-    level: Level;
-    type: Type;
-    duration: number;
-    price: number;
-    maxStudents: number;
-    isActive: boolean;
+  title: string;
+  description: string;
+  level: Level;
+  type: Type;
+  duration: number;
+  price: number;
 }
-export {LessonPackage, CreateLessonPackage}
+
+interface UpdatePackage {
+  title?: string;
+  description?: string;
+  level? : Level;
+  type?: Type;
+  duration?: number;
+  price?: number;
+  is_active?: boolean
+}
+export { LessonPackage, CreateLessonPackage, UpdatePackage };

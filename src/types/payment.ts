@@ -3,25 +3,20 @@ type PaymentMethod = 'mobile-money' | 'bank-transfer';
 type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded';
 
 interface Payment {
-  id: string;
-  enrollmentId: string;
+  payment_id: string;
+  enrollment_id: string;
   amount: number;
-  paymentMethod: PaymentMethod;
-  transactionReference: string;
+  payment_method: PaymentMethod;
+  transaction_reference: string;
   status: PaymentStatus;
-  paidAt: string | null;
+  paid_at: string | null;
 }
 
 interface CreatePayment {
-  enrollmentId: string;
+  enrollment_id: string;
   amount: number;
-  paymentMethod: PaymentMethod;
-  transactionReference: string;
+  payment_method: PaymentMethod;
+  transaction_reference: string;
 }
 
-export {
-  Payment,
-  CreatePayment,
-  PaymentMethod,
-  PaymentStatus,
-};
+export { Payment, CreatePayment, PaymentMethod, PaymentStatus };

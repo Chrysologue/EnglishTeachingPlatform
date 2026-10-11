@@ -1,20 +1,15 @@
-type EnrollmentStatus =
-  | 'pending'
-  | 'confirmed'
-  | 'cancelled'
-  | 'completed';
+type EnrollmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
 
 interface Enrollment {
-  id: string;
-  studentId: string;
-  sessionId: string;
+  enrollment_id: string;
+  student_id: string;
+  session_id: string;
   status: EnrollmentStatus;
-  enrolledAt: string;
+  enrolled_at: string;
 }
 
 interface CreateEnrollment {
-  studentId: string;
-  sessionId: string;
+  session_id: string;
 }
 
 export { Enrollment, CreateEnrollment };

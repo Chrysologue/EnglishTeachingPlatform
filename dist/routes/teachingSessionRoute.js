@@ -10,5 +10,5 @@ router.get('/', teachingSessionController_1.default.getAllTeachingSessions);
 router.post('/', teachingSessionController_1.default.createTeachingSession);
 router.get('/:id', teachingSessionController_1.default.getTeachingSessionById);
 router.put('/:id', teachingSessionController_1.default.updateTeachingSession);
-router.delete('/:id', teachingSessionController_1.default.deleteTeachingSession);
+router.delete('/:id', teachingSessionController_1.default.cancelTeachingSession);
 exports.default = router;

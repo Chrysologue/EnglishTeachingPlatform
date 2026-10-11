@@ -1,171 +1,118 @@
-import { teachingSessions } from '../data/teachingSessions';
-import { packages } from '../data/packages';
-import {
-  TeachingSession,
-  CreateTeachingSession,
-} from '../types/teachingSession';
+
 import { Request, Response } from 'express';
+import {
+  getAllTeachingSession,
+  getSessionById,
+  createSession,
+  updateSession,
+  cancelSession,
+} from '../models/sessionModel';
+import {
+  CreateTeachingSession,
+  UpdateTeachingSession,
+} from '../types/teachingSession';
 
 interface TeachingSessionController {
-  getAllTeachingSessions: (req: Request, res: Response) => Response;
-  getTeachingSessionById: (req: Request, res: Response) => Response;
-  createTeachingSession: (
-    req: Request,
-    res: Response,
-  ) => Response;
-  updateTeachingSession: (req: Request, res: Response) => Response;
-  deleteTeachingSession: (req: Request, res: Response) => Response;
+  getAllTeachingSessions: (req: Request, res: Response) => Promise<Response>;
+  getTeachingSessionById: (req: Request, res: Response) => Promise<Response>;
+  createTeachingSession: (req: Request, res: Response) => Promise<Response>;
+  updateTeachingSession: (req: Request, res: Response) => Promise<Response>;
+  cancelTeachingSession: (req: Request, res: Response) => Promise<Response>;
 }
 
-const teachingSessionController: TeachingSessionController = {
-  getAllTeachingSessions: function (req: Request, res: Response) {
-    return res.status(200).json(teachingSessions);
+const sessionController: TeachingSessionController = {
+  getAllTeachingSessions: async function (req: Request, res: Response) {
+    try {
+      const result = await getAllTeachingSession();
+      return res.status(200).json(result);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
   },
 
-  getTeachingSessionById: function (req: Request, res: Response) {
-    const id = req.params.id;
+  getTeachingSessionById: async function (req: Request, res: Response) {
+    try {
+      const id = req.params.id;
 
-    const session = teachingSessions.find(
-      (session) => session.id === id,
-    );
-
-    if (!session) {
-      return res.status(404).json({
-        error: 'Teaching session not found',
-      });
-    }
-
-    return res.status(200).json(session);
-  },
-
-  createTeachingSession: function (
-    req: Request<{}, {}, CreateTeachingSession>,
-    res: Response,
-  ) {
-    const {
-      packageId,
-      date,
-      startTime,
-      endTime,
-      maxStudents,
-      meetingLink,
-    } = req.body;
-
-    if (
-      !packageId ||
-      !date ||
-      !startTime ||
-      !endTime ||
-      !maxStudents ||
-      !meetingLink
-    ) {
-      return res.status(400).json({
-        error: 'All fields are required',
-      });
-    }
-
-    const lessonPackage = packages.find(
-      (pack) => pack.id === packageId,
-    );
-
-    if (!lessonPackage) {
-      return res.status(404).json({
-        error: 'Package not found',
-      });
-    }
-
-    const id = `session-00${teachingSessions.length + 1}`;
-
-    const teachingSession: TeachingSession = {
-      id,
-      packageId,
-      date,
-      startTime,
-      endTime,
-      maxStudents,
-      meetingLink,
-      status: 'scheduled',
-    };
-
-    teachingSessions.push(teachingSession);
-
-    return res.status(201).json({
-      message: 'Teaching session created successfully',
-      session: teachingSession,
-    });
-  },
-
-  updateTeachingSession: function (
-    req: Request,
-    res: Response,
-  ) {
-    const allowedFields = [
-      'date',
-      'startTime',
-      'endTime',
-      'maxStudents',
-      'meetingLink',
-      'status',
-    ];
-
-    const updatedSession: {
-      [key: string]: string | number;
-    } = {};
-
-    for (const field of allowedFields) {
-      if (req.body[field] !== undefined) {
-        updatedSession[field] = req.body[field];
+      if (typeof id !== 'string') {
+        return res.status(400).json({ error: 'Invalid session ID' });
       }
+
+      const session = await getSessionById(id);
+
+      if (!session) {
+        return res.status(404).json({ error: 'Session not found' });
+      }
+
+      return res.status(200).json(session);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal server error' });
     }
-
-    const id = req.params.id;
-
-    const session = teachingSessions.find(
-      (session) => session.id === id,
-    );
-
-    if (!session) {
-      return res.status(404).json({
-        error: 'Teaching session not found',
-      });
-    }
-
-    if (Object.keys(updatedSession).length === 0) {
-      return res.status(400).json({
-        error: 'No valid fields provided for update',
-      });
-    }
-
-    Object.assign(session, updatedSession);
-
-    return res.status(200).json({
-      message: 'Teaching session updated successfully',
-      session,
-    });
   },
 
-  deleteTeachingSession: function (
-    req: Request,
-    res: Response,
-  ) {
-    const id = req.params.id;
+  createTeachingSession: async function (req: Request, res: Response) {
+    try {
+      const session: CreateTeachingSession = req.body;
 
-    const index = teachingSessions.findIndex(
-      (session) => session.id === id,
-    );
+      const result = await createSession(session);
 
-    if (index === -1) {
-      return res.status(404).json({
-        error: 'Teaching session not found',
-      });
+      return res.status(201).json(result);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal server error' });
     }
+  },
 
-    teachingSessions.splice(index, 1);
+  updateTeachingSession: async function (req: Request, res: Response) {
+    try {
+      const id = req.params.id;
 
-    return res.status(200).json({
-      message: 'Teaching session deleted successfully',
-    });
+      if (typeof id !== 'string') {
+        return res.status(400).json({ error: 'Invalid session ID' });
+      }
+
+      const session: UpdateTeachingSession = req.body;
+
+      const result = await updateSession(id, session);
+
+      if (!result) {
+        return res.status(404).json({
+          error: 'Session not found or no fields provided to update',
+        });
+      }
+
+      return res.status(200).json(result);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  cancelTeachingSession: async function (req: Request, res: Response) {
+    try {
+      const id = req.params.id;
+
+      if (typeof id !== 'string') {
+        return res.status(400).json({ error: 'Invalid session ID' });
+      }
+
+      const result = await cancelSession(id);
+
+      if (!result) {
+        return res.status(404).json({ error: 'Session not found' });
+      }
+
+      return res.status(200).json({
+        message: 'Session cancelled successfully',
+        session: result,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
   },
 };
 
-export default teachingSessionController;
+export default sessionController;

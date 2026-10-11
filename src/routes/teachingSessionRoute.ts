@@ -12,6 +12,6 @@ router.get('/:id', teachingSessionController.getTeachingSessionById);
 
 router.put('/:id', teachingSessionController.updateTeachingSession);
 
-router.delete('/:id', teachingSessionController.deleteTeachingSession);
+router.delete('/:id', teachingSessionController.cancelTeachingSession);
 
 export default router;

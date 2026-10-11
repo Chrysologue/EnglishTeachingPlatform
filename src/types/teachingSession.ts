@@ -1,23 +1,47 @@
 type SessionStatus = 'scheduled' | 'completed' | 'cancelled';
+type Level = 'Beginner' | 'Intermediate' | 'Advanced';
+type Type = 'group' | 'one-to-one';
 
 interface TeachingSession {
-  id: string;
-  packageId: string;
+  session_id: string;
+  package_id: string;
   date: string;
-  startTime: string;
-  endTime: string;
-  maxStudents: number;
-  meetingLink: string;
+  start_time: string;
+  end_time: string;
+  max_students: number;
+  meeting_link: string;
   status: SessionStatus;
 }
 
 interface CreateTeachingSession {
-  packageId: string;
+  package_id: string;
   date: string;
-  startTime: string;
-  endTime: string;
-  maxStudents: number;
-  meetingLink: string;
+  start_time: string;
+  end_time: string;
+  max_students: number;
+  meeting_link: string;
 }
 
-export { TeachingSession, CreateTeachingSession };
+interface UpdateTeachingSession {
+  date?: string;
+  start_time?: string;
+  end_time?: string;
+  max_students?: number;
+  meeting_link?: string;
+  status?: SessionStatus;
+}
+
+interface SessionWithPackage extends TeachingSession {
+  title: string;
+  description: string;
+  level: Level;
+  type: Type;
+  duration: number;
+  price: number;
+}
+export {
+  TeachingSession,
+  CreateTeachingSession,
+  UpdateTeachingSession,
+  SessionWithPackage,
+};
