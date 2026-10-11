@@ -1,7 +1,7 @@
 type Level = "Beginner" | "Intermediate" | "Advanced"
 type Role = "student" | "admin" | "teacher"
 interface UserDetails  {
-  student_id: string;
+  user_id: string;
   name: string;
   email: string;
   password: string;
